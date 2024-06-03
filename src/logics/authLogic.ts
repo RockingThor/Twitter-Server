@@ -6,28 +6,61 @@ import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../configs/envConfigs";
 
 export async function signUp(req: Request, res: Response) {
-    const { name, email, password } = req.body;
+    const { name, email, password, username } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const existingUser = await prisma.user.findFirst({
+    const existingUserUsingEmail = await prisma.user.findFirst({
         where: {
             email,
         },
     });
 
-    if (existingUser) {
+    const existingUserUsingUsername = await prisma.user.findFirst({
+        where: {
+            username,
+        },
+    });
+
+    if (existingUserUsingEmail || existingUserUsingUsername) {
         return res
             .status(StatusCodes.CONFLICT)
-            .json({ message: "Email already exists" });
+            .json({ message: "Email or username already exists" });
     }
 
-    const user = await prisma.user.create({
-        data: {
-            name,
-            email,
-            hashedPassword,
-        },
+    const user = await prisma.$transaction(async (prisma) => {
+        const oldUser = await prisma.user.create({
+            data: {
+                username,
+                name,
+                email,
+                hashedPassword,
+            },
+        });
+
+        const followers = await prisma.followers.create({
+            data: {
+                count: 0,
+            },
+        });
+
+        const following = await prisma.following.create({
+            data: {
+                count: 0,
+            },
+        });
+
+        const user = await prisma.user.update({
+            where: {
+                id: oldUser.id,
+            },
+            data: {
+                followersId: followers.id,
+                followingId: following.id,
+            },
+        });
+
+        return user;
     });
 
     const token = jwt.sign({ userId: user.id }, JWT_SECRET, {
@@ -43,16 +76,27 @@ export async function signUp(req: Request, res: Response) {
 export async function signIn(req: Request, res: Response) {
     const { email, password } = req.body;
 
-    const exisistingUser = await prisma.user.findFirst({
+    const exisistingUserByEmail = await prisma.user.findFirst({
         where: {
             email,
         },
     });
 
-    if (!exisistingUser)
+    const exisistingUserByUsername = await prisma.user.findFirst({
+        where: {
+            username: email,
+        },
+    });
+
+    if (!exisistingUserByEmail && !exisistingUserByUsername)
         return res
             .status(StatusCodes.NOT_FOUND)
             .json({ message: "User not found" });
+
+    let exisistingUser: any = null;
+
+    if (!exisistingUserByUsername) exisistingUser = exisistingUserByEmail;
+    else exisistingUser = exisistingUserByUsername;
 
     const isMatch = await bcrypt.compare(
         password,

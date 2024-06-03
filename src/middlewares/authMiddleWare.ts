@@ -5,11 +5,13 @@ import { JWT_SECRET } from "../configs/envConfigs";
 import { AuthenticatedRequests } from "../types/types";
 
 export async function authMiddleware(
-    req: AuthenticatedRequests,
+    req: Request,
     res: Response,
     next: NextFunction
 ) {
+    // console.log("Was here");
     const authorization = req.headers.authorization;
+    // console.log(authorization);
 
     if (!authorization)
         return res
@@ -20,6 +22,7 @@ export async function authMiddleware(
         userId: number;
     };
 
+    //@ts-ignore
     req.userId = decryptedData.userId;
     next();
 }

@@ -15,13 +15,63 @@ datasource db {
 
 model User{
   id                     Int            @id @default(autoincrement()) 
+  username               String         @unique
   name                   String
   email                  String         @unique
-  profileImage           String         @default("")
+  profileImage           String?        
+  backgroundImage        String?        
   hashedPassword         String
+  bio                    String         @default("Welcome to my twitter profile.")
+  followersId            Int?
+  followers              Followers ?     @relation(fields: [followersId], references: [id])
+  followingId            Int?
+  following              Following    ?  @relation(fields: [followingId], references: [id])
+  Tweets                 Tweet[]
+  likes                  Like[]
   resetOTP               String?
   resetTime              DateTime?
   createdAt              DateTime       @default(now())
   updatedAt              DateTime       @default(now())      
 }
 
+model Followers{
+  id                     Int            @id @default(autoincrement())
+  count                  Int
+  details                User[]
+}
+
+model Following{
+  id                     Int            @id @default(autoincrement())
+  count                  Int
+  details                User[]
+}
+
+model Image{
+  id                     Int            @id @default(autoincrement())
+  url                    String
+  tweetId                Int            
+  tweet                  Tweet          @relation(fields: [tweetId], references: [id])    
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @default(now())
+}
+
+
+
+model Tweet{
+  id                     Int            @id @default(autoincrement())
+  content                String        
+  like                   Like?         
+  authorId               Int
+  imageUrls              Image[] 
+  author                 User           @relation(fields: [authorId], references:[id])       
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @default(now())
+}
+
+model Like{
+  id                     Int             @id @default(autoincrement())
+  tweetId                Int             @unique
+  tweet                  Tweet           @relation(fields: [tweetId], references: [id])
+  count                  Int
+  details                User[]
+}
