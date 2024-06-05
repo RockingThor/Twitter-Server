@@ -27,7 +27,7 @@ model User{
   followingId            Int?
   following              Following    ?  @relation(fields: [followingId], references: [id])
   Tweets                 Tweet[]
-  likes                  Like[]
+  likes                  Int[]           @default([])
   resetOTP               String?
   resetTime              DateTime?
   createdAt              DateTime       @default(now())
@@ -59,8 +59,9 @@ model Image{
 
 model Tweet{
   id                     Int            @id @default(autoincrement())
-  content                String        
-  like                   Like?         
+  content                String  
+  likeId                 Int  ?    
+  like                   Like?        
   authorId               Int
   imageUrls              Image[] 
   author                 User           @relation(fields: [authorId], references:[id])       
@@ -73,5 +74,5 @@ model Like{
   tweetId                Int             @unique
   tweet                  Tweet           @relation(fields: [tweetId], references: [id])
   count                  Int
-  details                User[]
+  details                Int[]           @default([])
 }

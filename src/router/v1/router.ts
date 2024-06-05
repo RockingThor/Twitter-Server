@@ -8,6 +8,8 @@ import {
     profileLogicWithAuthHeader,
     profileLogicWithoutAuthHeader,
 } from "../../logics/profileLogic";
+import { likeTweet, writeTweet } from "../../logics/tweetLogic";
+import { fetchTweet } from "../../logics/fetchTweet";
 
 const v1router = Router();
 
@@ -23,7 +25,7 @@ v1router.post("/signin", async (req, res) => {
     signIn(req, res);
 });
 
-v1router.get("/validate-username", async (req, res) => {
+v1router.post("/validate-username", async (req, res) => {
     validateUsername(req, res);
 });
 
@@ -37,6 +39,18 @@ v1router.get("/me", authMiddleware, async (req, res) => {
 
 v1router.get("/profile", async (req, res) => {
     profileLogicWithoutAuthHeader(req, res);
+});
+
+v1router.post("/tweet", authMiddleware, async (req, res) => {
+    writeTweet(req, res);
+});
+
+v1router.post("/like-a-post", authMiddleware, async (req, res) => {
+    likeTweet(req, res);
+});
+
+v1router.post("/fetchTweet", authMiddleware, async (req, res) => {
+    fetchTweet(req, res);
 });
 
 export default v1router;
