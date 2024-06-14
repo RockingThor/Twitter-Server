@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
 import prisma from "../configs/dbConfig";
 import { StatusCodes } from "http-status-codes";
+import { spinTheTrancoderContainerFargate } from "./AWSLogic";
 
 export async function writeTweet(req: Request, res: Response) {
     try {
         //@ts-ignore
         const userId = req.userId;
-        const { content } = req.body;
+        const { content, videoURL } = req.body;
 
         //TODO: Add image suppport
 
@@ -15,6 +16,7 @@ export async function writeTweet(req: Request, res: Response) {
                 data: {
                     content,
                     authorId: userId,
+                    video: videoURL.length > 1 ? true : false,
                 },
             });
 
@@ -42,6 +44,15 @@ export async function writeTweet(req: Request, res: Response) {
                     },
                 },
             });
+
+            if (videoURL.length > 1) {
+                const res = await spinTheTrancoderContainerFargate(
+                    videoURL,
+                    tweetWithoutLike.id
+                );
+                console.log(res);
+            }
+
             return tweetWithLike;
         });
         return res.status(StatusCodes.CREATED).json({ tweetId: tweet.id });
@@ -97,5 +108,44 @@ export async function likeTweet(req: Request, res: Response) {
         return res
             .status(StatusCodes.INTERNAL_SERVER_ERROR)
             .json({ message: "Internal server error" });
+    }
+}
+
+export async function fetchProfileTweet(req: Request, res: Response) {
+    try {
+        const { skip, username } = req.body;
+
+        const user = await prisma.user.findUnique({
+            where: {
+                username,
+            },
+        });
+
+        if (!user) {
+            return res
+                .status(StatusCodes.NOT_FOUND)
+                .json({ message: "User not found" });
+        }
+
+        const tweets = await prisma.tweet.findMany({
+            where: {
+                authorId: Number(user.id),
+            },
+            skip: Number(skip),
+            take: 10,
+            include: {
+                like: {
+                    select: {
+                        count: true,
+                    },
+                },
+                imageUrls: true,
+            },
+        });
+        return res.status(StatusCodes.OK).json({ tweets });
+    } catch (error) {
+        return res
+            .status(StatusCodes.INTERNAL_SERVER_ERROR)
+            .json({ message: "SOmething went wrong" });
     }
 }

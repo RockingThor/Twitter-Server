@@ -15,6 +15,7 @@
         "@types/express": "^4.17.21",
         "@types/jsonwebtoken": "^9.0.6",
         "@types/node": "^20.12.13",
+        "@types/request": "^2.48.12",
         "@typescript-eslint/eslint-plugin": "^7.11.0",
         "@typescript-eslint/parser": "^7.11.0",
         "eslint": "^9.3.0",
@@ -25,6 +26,9 @@
         "typescript": "^5.4.5"
     },
     "dependencies": {
+        "@aws-sdk/client-ecs": "^3.594.0",
+        "@aws-sdk/client-s3": "^3.592.0",
+        "@aws-sdk/s3-presigned-post": "^3.592.0",
         "@prisma/client": "5.14.0",
         "@types/cors": "^2.8.17",
         "bcrypt": "^5.1.1",
@@ -32,6 +36,7 @@
         "dotenv": "^16.4.5",
         "express": "^4.19.2",
         "http-status-codes": "^2.3.0",
-        "jsonwebtoken": "^9.0.2"
+        "jsonwebtoken": "^9.0.2",
+        "request": "^2.88.2"
     }
 }

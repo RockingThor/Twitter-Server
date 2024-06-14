@@ -8,10 +8,18 @@ import {
     profileLogicWithAuthHeader,
     profileLogicWithoutAuthHeader,
 } from "../../logics/profileLogic";
-import { likeTweet, writeTweet } from "../../logics/tweetLogic";
+import {
+    fetchProfileTweet,
+    likeTweet,
+    writeTweet,
+} from "../../logics/tweetLogic";
 import { fetchTweet } from "../../logics/fetchTweet";
+import { followAPerson, getWhomTOFollow } from "../../logics/follow";
+import cloudRouter from "./cloudTrx";
 
 const v1router = Router();
+
+v1router.use("/cloud", cloudRouter);
 
 v1router.post("/ping", async (req, res) => {
     res.send("pong");
@@ -51,6 +59,18 @@ v1router.post("/like-a-post", authMiddleware, async (req, res) => {
 
 v1router.post("/fetchTweet", authMiddleware, async (req, res) => {
     fetchTweet(req, res);
+});
+
+v1router.get("/whom-to-follow", authMiddleware, async (req, res) => {
+    getWhomTOFollow(req, res);
+});
+
+v1router.post("/follow-a-person", authMiddleware, async (req, res) => {
+    followAPerson(req, res);
+});
+
+v1router.post("/fetch-profile-tweet", async (req, res) => {
+    fetchProfileTweet(req, res);
 });
 
 export default v1router;
