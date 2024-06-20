@@ -89,3 +89,18 @@ export async function profileLogicWithAuthHeader(req: Request, res: Response) {
 
     return res.status(StatusCodes.ACCEPTED).json({ profile: data });
 }
+
+export async function editProfileDetailsWithHeader(
+    req: Request,
+    res: Response
+) {
+    //@ts-ignore
+    const id = req.userId;
+    const { name, imageURL, bio, email } = req.body;
+
+    const user = await prisma.user.findUnique({
+        where: {
+            id: Number(id),
+        },
+    });
+}

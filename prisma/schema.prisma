@@ -28,10 +28,22 @@ model User{
   following              Following    ?  @relation(fields: [followingId], references: [id])
   Tweets                 Tweet[]
   likes                  Int[]           @default([])
+  EmailValidation        EmailValidation[]
   resetOTP               String?
   resetTime              DateTime?
+  isEmailVerified        Boolean        @default(false)
   createdAt              DateTime       @default(now())
   updatedAt              DateTime       @default(now())      
+}
+
+model EmailValidation{
+  id                     Int            @id @default(autoincrement())
+  email                  String
+  userId                 Int
+  user                   User           @relation(fields: [userId], references: [id])
+  token                  String         @unique
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @default(now())
 }
 
 model Followers{

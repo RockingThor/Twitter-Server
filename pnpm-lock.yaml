@@ -14,6 +14,9 @@ dependencies:
   '@aws-sdk/s3-presigned-post':
     specifier: ^3.592.0
     version: 3.592.0
+  '@emailjs/browser':
+    specifier: ^4.3.3
+    version: 4.3.3
   '@prisma/client':
     specifier: 5.14.0
     version: 5.14.0(prisma@5.14.0)
@@ -793,6 +796,11 @@ packages:
     dependencies:
       '@smithy/types': 3.0.0
       tslib: 2.6.2
+    dev: false
+
+  /@emailjs/browser@4.3.3:
+    resolution: {integrity: sha512-ltpt2S/WVREIBXptxYAVYBvXb2O6yTUYiRUWF8OLikMxlmiGsIgKpgHppikNd4Df0uAav7jCsQKcOJ3TJFUx5g==}
+    engines: {node: '>=14.0.0'}
     dev: false
 
   /@eslint-community/eslint-utils@4.4.0(eslint@9.3.0):
