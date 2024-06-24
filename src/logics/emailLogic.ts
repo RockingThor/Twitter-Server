@@ -38,15 +38,8 @@ export async function profileEditEmailVErification(
     const userId = req.userId;
     const { name, imageURL, bio, email } = req.body;
 
-    // emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
-    // .then(function(response) {
-    //    console.log('SUCCESS!', response.status, response.text);
-    // }, function(error) {
-    //    console.log('FAILED...', error);
-    // });
-
     const templateParam: any = generateTemplateParams(userId, name);
-    const response = emailjs.send(
+    const response = await emailjs.send(
         EMAILJS_SERVICE_ID,
         EMAILJS_TEMPLATE_ID,
         templateParam
